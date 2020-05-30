@@ -30,8 +30,17 @@ public class Login extends javax.swing.JFrame {
             rs = ps.executeQuery();
             //verifica se existe o usuario digitado
             if (rs.next()) {
+                //obtem o cargo usuario
+                String cargo = rs.getString(4);
+                //obtem o nome do usuario
+                String nome = rs.getString(2);
                 TelaPrincipal tela_principal = new TelaPrincipal();
                 tela_principal.setVisible(true);
+                TelaPrincipal.lblUsuario.setText(nome);
+                if (cargo.equals("1")) {
+                    TelaPrincipal.menuCadastroRelatorio.setEnabled(true);
+                    TelaPrincipal.menuRelatorio.setEnabled(true);
+                }
                 this.dispose();
                 c.close();
             } else {
