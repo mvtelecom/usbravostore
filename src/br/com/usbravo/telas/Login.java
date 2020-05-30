@@ -3,7 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.usbravo.screens;
+package br.com.usbravo.telas;
+
+import java.sql.*;
+import br.com.usbravo.connections.ModuloConexao;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -11,11 +15,44 @@ package br.com.usbravo.screens;
  */
 public class Login extends javax.swing.JFrame {
 
+    Connection c = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    public void entrar() {
+        String sql = "SELECT * FROM `usuarios` WHERE `nome` = ? AND `senha` = ?";
+        //prepara a pesquisa do banco de dados
+        try {
+            ps = c.prepareStatement(sql);
+            ps.setString(1, txtName.getText());
+            ps.setString(2, txtPassword.getText());
+            //execute the query
+            rs = ps.executeQuery();
+            //verifica se existe o usuario digitado
+            if (rs.next()) {
+                TelaPrincipal tela_principal = new TelaPrincipal();
+                tela_principal.setVisible(true);
+                this.dispose();
+                c.close();
+            } else {
+                JOptionPane.showMessageDialog(null, "Usuario ou Senha inválidos");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+
+    }
+
     /**
      * Creates new form Login
      */
     public Login() {
         initComponents();
+        c = ModuloConexao.conector();
+        if (c == null) {
+            JOptionPane.showMessageDialog(null, "Conferir conexão com a internet ou a execução do banco de dados");
+            System.exit(0);
+        }
     }
 
     /**
@@ -45,11 +82,13 @@ public class Login extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel2.setText("Senha");
 
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icons/128.png"))); // NOI18N
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/user128.png"))); // NOI18N
 
         txtName.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        txtName.setText("Henrique");
 
         txtPassword.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        txtPassword.setText("123456");
         txtPassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtPasswordActionPerformed(evt);
@@ -57,6 +96,11 @@ public class Login extends javax.swing.JFrame {
         });
 
         btnLogin.setText("Entrar");
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoginActionPerformed(evt);
+            }
+        });
 
         btnRegister.setText("Cadastrar");
 
@@ -101,11 +145,11 @@ public class Login extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRegister)
                     .addComponent(btnLogin))
-                .addContainerGap())
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         setSize(new java.awt.Dimension(444, 308));
@@ -115,6 +159,11 @@ public class Login extends javax.swing.JFrame {
     private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtPasswordActionPerformed
+
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        // TODO add your handling code here:
+        entrar();
+    }//GEN-LAST:event_btnLoginActionPerformed
 
     /**
      * @param args the command line arguments
