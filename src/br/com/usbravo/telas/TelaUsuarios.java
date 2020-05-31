@@ -55,6 +55,28 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
         txtSenha.setText(null);
     }
 
+    private void remover() {
+        int confirmar = JOptionPane.showConfirmDialog(null, "Deseja realmente remover Usuario?", "Atenção", JOptionPane.YES_NO_OPTION);
+        if (confirmar == JOptionPane.YES_NO_OPTION) {
+            String sql = "DELETE FROM `usuarios` WHERE `usuarios`.`nome` = ?";
+            try {
+                ps = c.prepareStatement(sql);
+                ps.setString(1, txtUsuario.getText());
+                //atualiza a tabela usuarios com os dados dos campos
+                int adicionado = ps.executeUpdate();
+                if (adicionado > 0) {
+                    JOptionPane.showMessageDialog(null, "Usuário removido com sucesso");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Usuário não encontrado");
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Nome do Usuário já está em uso");
+            }
+            txtUsuario.setText(null);
+            txtSenha.setText(null);
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -114,6 +136,11 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/removeuser.png"))); // NOI18N
         jButton3.setToolTipText("Remover");
         jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/helpuser128.png"))); // NOI18N
 
@@ -183,6 +210,11 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
         // adicionar usuarios
         adicionar();
     }//GEN-LAST:event_btnAddActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // remover usuario
+        remover();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
