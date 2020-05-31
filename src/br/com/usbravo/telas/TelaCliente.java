@@ -9,6 +9,7 @@ import java.sql.*;
 import br.com.usbravo.connections.ModuloConexao;
 import javax.swing.JOptionPane;
 import net.proteanit.sql.DbUtils;
+import sun.awt.X11.XConstants;
 
 /**
  *
@@ -26,10 +27,11 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     public TelaCliente() {
         initComponents();
         c = ModuloConexao.conector();
+        pesquisar_cliente();
     }
 
     private void adicionar() {
-        String sql = "INSERT INTO `cliente` VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO `clientes` VALUES (NULL, ?, ?, ?, ?, ?, ?, ?,?)";
         try {
             ps = c.prepareStatement(sql);
             ps.setString(1, txtNome.getText());
@@ -39,11 +41,11 @@ public class TelaCliente extends javax.swing.JInternalFrame {
             ps.setString(5, txtBairro.getText());
             ps.setString(6, txtCep.getText());
             ps.setString(7, txtCidade.getText());
+            ps.setString(8, txtTelefone.getText());
 
-            if (txtNome.getText().isEmpty() || txtCpf.getText().isEmpty() || txtIdentidade.getText().isEmpty() || txtRua.getText().isEmpty() || txtBairro.getText().isEmpty() || txtCep.getText().isEmpty() | txtCidade.getText().isEmpty() || txtTelefone1.getText().isEmpty()) {
+            if (txtNome.getText().isEmpty() || txtCpf.getText().isEmpty() || txtIdentidade.getText().isEmpty() || txtRua.getText().isEmpty() || txtBairro.getText().isEmpty() || txtCep.getText().isEmpty() | txtCidade.getText().isEmpty() || txtTelefone.getText().isEmpty() || txtTelefone.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Preencha todos os campos");
             } else {
-
                 //atualiza a tabela usuarios com os dados dos campos
                 int adicionado = ps.executeUpdate();
                 if (adicionado > 0) {
@@ -55,33 +57,121 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                     txtBairro.setText(null);
                     txtCep.setText(null);
                     txtCidade.setText(null);
+                    txtTelefone.setText(null);
+
                 }
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "CPF já cadastrado");
+            JOptionPane.showMessageDialog(null, "CPF em uso");
         }
 
     }
 
     private void pesquisar_cliente() {
-        String sql = "SELECT nome, cpf, identidade FROM cliente WHERE nome like ?";
+        String sql = "SELECT `idcliente`, `nome`, `cpf`, `identidade`, `telefone` FROM `clientes` WHERE `nome` like ?";
         try {
             ps = c.prepareStatement(sql);
             ps.setString(1, txtPesquisar.getText() + "%");
             rs = ps.executeQuery();
             //usando a biblioteca rs2.xml para preencher a tabela
             tblClientes.setModel(DbUtils.resultSetToTableModel(rs));
+            tblClientes.setEnabled(true);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,e);
+            JOptionPane.showMessageDialog(null, e);
         }
     }
 
     public void setar_campos() {
         int setar = tblClientes.getSelectedRow();
-        txtNome.setText(tblClientes.getModel().getValueAt(setar, 0).toString());
-        txtCpf.setText(tblClientes.getModel().getValueAt(setar, 1).toString());
-        txtIdentidade.setText(tblClientes.getModel().getValueAt(setar, 2).toString());
-        
+        txtIdcliente.setText(tblClientes.getModel().getValueAt(setar, 0).toString());
+        txtNome.setText(tblClientes.getModel().getValueAt(setar, 1).toString());
+        txtCpf.setText(tblClientes.getModel().getValueAt(setar, 2).toString());
+        txtIdentidade.setText(tblClientes.getModel().getValueAt(setar, 3).toString());
+        txtTelefone.setText(tblClientes.getModel().getValueAt(setar, 4).toString());
+        btnAdicionar.setEnabled(false);
+        btnAtualizar.setEnabled(true);
+        btnRemover.setEnabled(true);
+
+    }
+
+    private void alterar() {
+        String sql = "UPDATE `clientes` SET `nome` = ?, `cpf` = ?, `identidade` = ?, `rua` = ?, `bairro` = ?, `cep` = ?, `cidade` = ?, `telefone` = ? WHERE `clientes`.`idcliente` = ?;";
+        try {
+            ps = c.prepareStatement(sql);
+            ps.setString(1, txtNome.getText());
+            ps.setString(2, txtCpf.getText());
+            ps.setString(3, txtIdentidade.getText());
+            ps.setString(4, txtRua.getText());
+            ps.setString(5, txtBairro.getText());
+            ps.setString(6, txtCep.getText());
+            ps.setString(7, txtCidade.getText());
+            ps.setString(8, txtTelefone.getText());
+            ps.setString(9, txtIdcliente.getText());
+
+            if (txtNome.getText().isEmpty() || txtCpf.getText().isEmpty() || txtIdentidade.getText().isEmpty() || txtRua.getText().isEmpty() || txtBairro.getText().isEmpty() || txtCep.getText().isEmpty() | txtCidade.getText().isEmpty() || txtTelefone.getText().isEmpty() || txtTelefone.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Preencha todos os campos");
+            } else {
+                //atualiza a tabela usuarios com os dados dos campos
+                int alterado = ps.executeUpdate();
+                if (alterado > 0) {
+                    JOptionPane.showMessageDialog(null, "Cliente alterado com sucesso");
+                    txtNome.setText(null);
+                    txtCpf.setText(null);
+                    txtIdentidade.setText(null);
+                    txtRua.setText(null);
+                    txtBairro.setText(null);
+                    txtCep.setText(null);
+                    txtCidade.setText(null);
+                    txtTelefone.setText(null);
+                    txtIdcliente.setText(null);
+                    btnAdicionar.setEnabled(true);
+                    btnAtualizar.setEnabled(false);
+                    btnRemover.setEnabled(false);
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "CPF em uso");
+
+        }
+    }
+
+    private void remover() {
+        int confirmar = JOptionPane.showConfirmDialog(null, "Deseja realmente remover Usuario?", "Atenção", JOptionPane.YES_NO_OPTION);
+        if (confirmar == JOptionPane.YES_NO_OPTION) {
+            String sql = "DELETE FROM `clientes` WHERE `clientes`.`idcliente` = ?";
+            try {
+                ps = c.prepareStatement(sql);
+                ps.setString(1, txtIdcliente.getText());
+                //remove o usuario digitado
+
+                if (txtIdcliente.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Selecione um cliente para remover");
+                } else {
+
+                    int remover = ps.executeUpdate();
+                    if (remover > 0) {
+                        JOptionPane.showMessageDialog(null, "Cliente removido com sucesso");                        
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Cliente não encontrado");
+                    }
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+            txtNome.setText(null);
+            txtCpf.setText(null);
+            txtIdentidade.setText(null);
+            txtRua.setText(null);
+            txtBairro.setText(null);
+            txtCep.setText(null);
+            txtCidade.setText(null);
+            txtTelefone.setText(null);
+            txtIdcliente.setText(null);
+            btnAdicionar.setEnabled(true);
+            btnAtualizar.setEnabled(false);
+            btnRemover.setEnabled(false);
+        }
     }
 
     /**
@@ -103,21 +193,21 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
         txtNome = new javax.swing.JTextField();
         txtCpf = new javax.swing.JTextField();
         txtIdentidade = new javax.swing.JTextField();
         txtRua = new javax.swing.JTextField();
         txtBairro = new javax.swing.JTextField();
         txtCep = new javax.swing.JTextField();
-        txtTelefone1 = new javax.swing.JTextField();
-        txtTelefone2 = new javax.swing.JTextField();
+        txtTelefone = new javax.swing.JTextField();
         txtPesquisar = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblClientes = new javax.swing.JTable();
         jLabel10 = new javax.swing.JLabel();
         txtCidade = new javax.swing.JTextField();
+        txtIdcliente = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
 
         setClosable(true);
         setIconifiable(true);
@@ -138,12 +228,24 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         btnAtualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/atualizaruser64.png"))); // NOI18N
         btnAtualizar.setToolTipText("Atualizar");
         btnAtualizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAtualizar.setEnabled(false);
         btnAtualizar.setPreferredSize(new java.awt.Dimension(80, 80));
+        btnAtualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtualizarActionPerformed(evt);
+            }
+        });
 
         btnRemover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/removeuser.png"))); // NOI18N
         btnRemover.setToolTipText("Excluir");
         btnRemover.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnRemover.setEnabled(false);
         btnRemover.setPreferredSize(new java.awt.Dimension(80, 80));
+        btnRemover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoverActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel1.setText("Nome");
@@ -164,10 +266,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         jLabel6.setText("CEP");
 
         jLabel7.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel7.setText("Telefone 1");
-
-        jLabel8.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel8.setText("Telefone 2");
+        jLabel7.setText("Telefone ");
 
         txtNome.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
 
@@ -181,9 +280,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
 
         txtCep.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
 
-        txtTelefone1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-
-        txtTelefone2.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        txtTelefone.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
 
         txtPesquisar.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         txtPesquisar.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -197,15 +294,16 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         tblClientes.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         tblClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Nome", "CPF", "Telefone"
+                "idCliente", "Nome", "CPF", "Telefone"
             }
         ));
+        tblClientes.setEnabled(false);
         tblClientes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblClientesMouseClicked(evt);
@@ -218,7 +316,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         });
         jScrollPane1.setViewportView(tblClientes);
         if (tblClientes.getColumnModel().getColumnCount() > 0) {
-            tblClientes.getColumnModel().getColumn(0).setPreferredWidth(5);
+            tblClientes.getColumnModel().getColumn(1).setPreferredWidth(5);
         }
 
         jLabel10.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
@@ -230,6 +328,12 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 txtCidadeActionPerformed(evt);
             }
         });
+
+        txtIdcliente.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        txtIdcliente.setEnabled(false);
+
+        jLabel8.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jLabel8.setText("Id do Cliente");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -270,20 +374,19 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                                     .addComponent(jLabel6)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                     .addComponent(txtCep, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(60, 60, 60)
-                                .addComponent(jLabel8)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtTelefone2, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(txtTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(33, 33, 33)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 968, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(txtPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, 418, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(46, 46, 46)
-                                .addComponent(jLabel9))))
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtIdcliente, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(328, 328, 328)
                         .addComponent(btnAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -299,10 +402,17 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtPesquisar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtPesquisar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(29, 29, 29)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtIdcliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel8))))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -332,9 +442,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
-                    .addComponent(txtTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8)
-                    .addComponent(txtTelefone2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(btnAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -351,6 +459,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     private void btnAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarActionPerformed
         // adicionar cliente
         adicionar();
+        pesquisar_cliente();
     }//GEN-LAST:event_btnAdicionarActionPerformed
 
     private void txtCidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCidadeActionPerformed
@@ -363,6 +472,7 @@ public class TelaCliente extends javax.swing.JInternalFrame {
 
     private void txtPesquisarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPesquisarKeyReleased
         // pesquisa avancada de clientes
+
         pesquisar_cliente();
     }//GEN-LAST:event_txtPesquisarKeyReleased
 
@@ -370,6 +480,18 @@ public class TelaCliente extends javax.swing.JInternalFrame {
         // setar os campos do cliente
         setar_campos();
     }//GEN-LAST:event_tblClientesMouseClicked
+
+    private void btnAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtualizarActionPerformed
+        // altera os dados do cliente
+        alterar();
+        pesquisar_cliente();
+    }//GEN-LAST:event_btnAtualizarActionPerformed
+
+    private void btnRemoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoverActionPerformed
+        // remover cliente selecionado
+        remover();
+        pesquisar_cliente();
+    }//GEN-LAST:event_btnRemoverActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -392,11 +514,11 @@ public class TelaCliente extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtCep;
     private javax.swing.JTextField txtCidade;
     private javax.swing.JTextField txtCpf;
+    private javax.swing.JTextField txtIdcliente;
     private javax.swing.JTextField txtIdentidade;
     private javax.swing.JTextField txtNome;
     private javax.swing.JTextField txtPesquisar;
     private javax.swing.JTextField txtRua;
-    private javax.swing.JTextField txtTelefone1;
-    private javax.swing.JTextField txtTelefone2;
+    private javax.swing.JTextField txtTelefone;
     // End of variables declaration//GEN-END:variables
 }

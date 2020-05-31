@@ -62,15 +62,24 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
             try {
                 ps = c.prepareStatement(sql);
                 ps.setString(1, txtUsuario.getText());
-                //atualiza a tabela usuarios com os dados dos campos
-                int adicionado = ps.executeUpdate();
-                if (adicionado > 0) {
+                //remove o usuario digitado
+                
+                
+                if (txtUsuario.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Campo Usuário está vazio");
+            } else {
+
+                 int remover = ps.executeUpdate();
+                if (remover > 0) {
                     JOptionPane.showMessageDialog(null, "Usuário removido com sucesso");
                 } else {
                     JOptionPane.showMessageDialog(null, "Usuário não encontrado");
                 }
+            }             
+                
+               
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Nome do Usuário já está em uso");
+                JOptionPane.showMessageDialog(null, e);
             }
             txtUsuario.setText(null);
             txtSenha.setText(null);
@@ -103,7 +112,7 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
         setPreferredSize(new java.awt.Dimension(1023, 630));
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel1.setText("Usuario");
+        jLabel1.setText("Usuário");
 
         jLabel2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel2.setText("Senha");
