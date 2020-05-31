@@ -28,7 +28,7 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
     }
 
     private void adicionar() {
-        String sql = "INSERT INTO `usuarios` (`idusuarios`, `nome`, `senha`, `idcargo`) VALUES (NULL, ?, ?, ?);";
+        String sql = "INSERT INTO `usuarios` VALUES (NULL, ?, ?, ?);";
         try {
             ps = c.prepareStatement(sql);
             ps.setString(1, txtUsuario.getText());
