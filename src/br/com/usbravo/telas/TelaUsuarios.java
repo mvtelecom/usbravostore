@@ -5,17 +5,54 @@
  */
 package br.com.usbravo.telas;
 
+import javax.swing.JOptionPane;
+import java.sql.*;
+import br.com.usbravo.connections.ModuloConexao;
+
 /**
  *
  * @author mv
  */
 public class TelaUsuarios extends javax.swing.JInternalFrame {
 
+    Connection c = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
     /**
      * Creates new form TelaUsuarios
      */
     public TelaUsuarios() {
         initComponents();
+        c = ModuloConexao.conector();
+    }
+
+    private void adicionar() {
+        String sql = "INSERT INTO `usuarios` (`idusuarios`, `nome`, `senha`, `idcargo`) VALUES (NULL, ?, ?, ?);";
+        try {
+            ps = c.prepareStatement(sql);
+            ps.setString(1, txtUsuario.getText());
+            ps.setString(2, txtSenha.getText());
+            if (cboCargo.getSelectedItem().toString().equals("Sim")) {
+                ps.setString(3, "1");
+            } else {
+                ps.setString(3, "2");
+            }
+            if (txtUsuario.getText().isEmpty() || txtSenha.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Preencha todos os campos");
+            } else {
+
+                //atualiza a tabela usuarios com os dados dos campos
+                int adicionado = ps.executeUpdate();
+                if (adicionado > 0) {
+                    JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso");
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Nome do Usuário já está em uso");
+        }
+        txtUsuario.setText(null);
+        txtSenha.setText(null);
     }
 
     /**
@@ -29,7 +66,7 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        txtNome = new javax.swing.JTextField();
+        txtUsuario = new javax.swing.JTextField();
         txtSenha = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         cboCargo = new javax.swing.JComboBox<>();
@@ -44,12 +81,12 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
         setPreferredSize(new java.awt.Dimension(1023, 630));
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
-        jLabel1.setText("Nome");
+        jLabel1.setText("Usuario");
 
         jLabel2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel2.setText("Senha");
 
-        txtNome.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        txtUsuario.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
 
         txtSenha.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
 
@@ -68,6 +105,11 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
         btnAdd.setToolTipText("Adicionar");
         btnAdd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnAdd.setPreferredSize(new java.awt.Dimension(80, 80));
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/removeuser.png"))); // NOI18N
         jButton3.setToolTipText("Remover");
@@ -88,18 +130,18 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
                         .addComponent(jButton3))
                     .addComponent(jLabel4)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtNome, javax.swing.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(12, 12, 12)
-                        .addComponent(txtSenha))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cboCargo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(230, 230, 230))
+                        .addComponent(cboCargo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
+                            .addComponent(txtSenha))))
+                .addContainerGap(213, Short.MAX_VALUE))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnAdd, jButton3});
@@ -111,7 +153,7 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
                 .addComponent(jLabel4)
                 .addGap(38, 38, 38)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addGap(45, 45, 45)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -137,6 +179,11 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_cboCargoActionPerformed
 
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        // adicionar usuarios
+        adicionar();
+    }//GEN-LAST:event_btnAddActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
@@ -146,7 +193,7 @@ public class TelaUsuarios extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JTextField txtNome;
     private javax.swing.JTextField txtSenha;
+    private javax.swing.JTextField txtUsuario;
     // End of variables declaration//GEN-END:variables
 }
