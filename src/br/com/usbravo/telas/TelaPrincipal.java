@@ -82,6 +82,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         menuCadastroRelatorio.setText("Usuários");
         menuCadastroRelatorio.setEnabled(false);
+        menuCadastroRelatorio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuCadastroRelatorioActionPerformed(evt);
+            }
+        });
         menuCadastro.add(menuCadastroRelatorio);
 
         menu.add(menuCadastro);
@@ -177,6 +182,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
         TelaSobre telaSobre = new TelaSobre();
         telaSobre.setVisible(true);
     }//GEN-LAST:event_menuAjudaSobreActionPerformed
+
+    private void menuCadastroRelatorioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCadastroRelatorioActionPerformed
+        // abri internamente a tela de cadastro do usuario 
+        TelaUsuarios telaUsuarios =  new TelaUsuarios();
+        telaUsuarios.setVisible(true);
+        desktop.add(telaUsuarios);
+    }//GEN-LAST:event_menuCadastroRelatorioActionPerformed
 
     /**
      * @param args the command line arguments
