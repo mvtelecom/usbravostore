@@ -40,6 +40,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         menuCadastro = new javax.swing.JMenu();
         menuCadastroCliente = new javax.swing.JMenuItem();
         menuCadastroRelatorio = new javax.swing.JMenuItem();
+        menuCadastroProduto = new javax.swing.JMenuItem();
         menuRelatorio = new javax.swing.JMenu();
         menuAjuda = new javax.swing.JMenu();
         menuAjudaSobre = new javax.swing.JMenuItem();
@@ -48,7 +49,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Us Bravo");
-        setPreferredSize(new java.awt.Dimension(1200, 600));
+        setPreferredSize(new java.awt.Dimension(1200, 655));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -64,7 +65,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         );
         desktopLayout.setVerticalGroup(
             desktopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 630, Short.MAX_VALUE)
+            .addGap(0, 679, Short.MAX_VALUE)
         );
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/user128.png"))); // NOI18N
@@ -93,6 +94,15 @@ public class TelaPrincipal extends javax.swing.JFrame {
             }
         });
         menuCadastro.add(menuCadastroRelatorio);
+
+        menuCadastroProduto.setText("Produto");
+        menuCadastroProduto.setEnabled(false);
+        menuCadastroProduto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuCadastroProdutoActionPerformed(evt);
+            }
+        });
+        menuCadastro.add(menuCadastroProduto);
 
         menu.add(menuCadastro);
 
@@ -202,6 +212,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
         desktop.add(telaCliente);
     }//GEN-LAST:event_menuCadastroClienteActionPerformed
 
+    private void menuCadastroProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCadastroProdutoActionPerformed
+        // abrir a tela produto:
+        TelaProduto telaProduto = new TelaProduto();
+        telaProduto.setVisible(true);
+        desktop.add(telaProduto);
+    }//GEN-LAST:event_menuCadastroProdutoActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -248,6 +265,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuAjudaSobre;
     private javax.swing.JMenu menuCadastro;
     private javax.swing.JMenuItem menuCadastroCliente;
+    public static javax.swing.JMenuItem menuCadastroProduto;
     public static javax.swing.JMenuItem menuCadastroRelatorio;
     private javax.swing.JMenu menuOpcoes;
     private javax.swing.JMenuItem menuOpcoesSair;
