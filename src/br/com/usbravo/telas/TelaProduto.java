@@ -18,7 +18,7 @@ public class TelaProduto extends javax.swing.JInternalFrame {
     Connection c = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
-    
+
     private String tamanho;
     private String status;
 
@@ -187,18 +187,38 @@ public class TelaProduto extends javax.swing.JInternalFrame {
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/read.png"))); // NOI18N
         jButton2.setToolTipText("Pesquisar Produto");
         jButton2.setPreferredSize(new java.awt.Dimension(80, 80));
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/update.png"))); // NOI18N
         jButton3.setToolTipText("Editar Produto");
         jButton3.setPreferredSize(new java.awt.Dimension(80, 80));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/clean64.png"))); // NOI18N
         jButton4.setToolTipText("Limpar Campos");
         jButton4.setPreferredSize(new java.awt.Dimension(80, 80));
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/usbravo/icones/delete.png"))); // NOI18N
         jButton5.setToolTipText("Remover Produto");
         jButton5.setPreferredSize(new java.awt.Dimension(80, 80));
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         buttonGroup2.add(rbts);
         rbts.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
@@ -354,10 +374,7 @@ public class TelaProduto extends javax.swing.JInternalFrame {
 
     private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
         // ao iniciar a tela marcar o radiobuton:
-        rbtp.setSelected(true);
-        tamanho = "P";
-        rbts.setSelected(true);
-        status = "sim";
+        inicializar_cbt();
     }//GEN-LAST:event_formInternalFrameOpened
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -378,6 +395,26 @@ public class TelaProduto extends javax.swing.JInternalFrame {
     private void txtdata_compraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtdata_compraActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtdata_compraActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // Limpar campos:
+        limpar_dados();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // excluir produto:
+        remover();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // consulta produtos:
+        consultar();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // altera os dados do produto:
+        alterar();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -419,13 +456,14 @@ public class TelaProduto extends javax.swing.JInternalFrame {
             ps.setString(5, txtpreco_compra.getText());
             ps.setString(6, txtpreco_venda.getText());
             ps.setString(7, status);
-            
+
             if (txtidproduto.getText().isEmpty() || txtdescricao.getText().isEmpty() || txtdata_compra.getText().isEmpty() || txtpreco_compra.getText().isEmpty() || txtpreco_venda.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Preencha todos os campos");
             } else {
 
                 //atualiza a tabela usuarios com os dados dos campos
-                int adicionado = ps.executeUpdate();System.out.println(ps);
+                int adicionado = ps.executeUpdate();
+                System.out.println(ps);
                 if (adicionado > 0) {
                     JOptionPane.showMessageDialog(null, "Produto cadastrado com sucesso");
                     limpar_dados();
@@ -437,11 +475,121 @@ public class TelaProduto extends javax.swing.JInternalFrame {
 
     }
 
+    private void consultar() {
+        String sql = "SELECT * FROM `produtos` WHERE `produtos`.`idproduto` = ?";
+        try {
+            ps = c.prepareStatement(sql);
+            ps.setString(1, txtidproduto.getText());
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                txtdescricao.setText(rs.getString("descricao"));
+                tamanho = rs.getString("tamanho");
+                txtdata_compra.setText(rs.getString("data_compra"));
+                txtpreco_compra.setText(rs.getString("preco_compra"));
+                txtpreco_venda.setText(rs.getString("preco_venda"));
+                status = rs.getString("status");                
+                // seta o campo tamonho
+                if (tamanho.equals("P")) {
+                    rbtp.setSelected(true);
+                }
+                if (tamanho.equals("M")) {
+                    rbtm.setSelected(true);
+                }
+                if (tamanho.equals("G")) {
+                    rbtg.setSelected(true);
+                }
+                if (tamanho.equals("GG")) {
+                    rbtgg.setSelected(true);
+                }
+                // seta o campo status
+                if (status.equals("sim")) {
+                    rbts.setSelected(true);
+                }
+                
+                if (status.equals("nao")) {
+                    rbtn.setSelected(true);
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Produto não cadastrado");
+                limpar_dados();
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+    
+    private void alterar() {
+        String sql = "UPDATE `produtos` SET `descricao` = ?, `tamanho` = ?, `data_compra` = ?, `preco_compra` = ?, `preco_venda` = ?, `status` = ? WHERE `produtos`.`idproduto` = ?";
+        try {
+            ps = c.prepareStatement(sql);            
+            ps.setString(1, txtdescricao.getText());
+            ps.setString(2, tamanho);
+            ps.setString(3, txtdata_compra.getText());
+            ps.setString(4, txtpreco_compra.getText());
+            ps.setString(5, txtpreco_venda.getText());
+            ps.setString(6, status);
+            ps.setString(7, txtidproduto.getText());            
+            
+            if (txtidproduto.getText().isEmpty() || txtdescricao.getText().isEmpty() || txtdata_compra.getText().isEmpty() || txtpreco_compra.getText().isEmpty() || txtpreco_venda.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Preencha todos os campos");
+            } else {
+
+                //atualiza a tabela produto com os dados dos campos
+                int alterado = ps.executeUpdate();
+                if (alterado > 0) {
+                    JOptionPane.showMessageDialog(null, "Produto alterado com sucesso");
+                    limpar_dados();
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+
+    }
+
+    private void remover() {
+        int confirmar = JOptionPane.showConfirmDialog(null, "Deseja realmente remover Produto??", "Atenção", JOptionPane.YES_NO_OPTION);
+        if (confirmar == JOptionPane.YES_NO_OPTION) {
+            String sql = "DELETE FROM `produtos` WHERE `produtos`.`idproduto` = ?";
+            try {
+                ps = c.prepareStatement(sql);
+                ps.setString(1, txtidproduto.getText());
+                //remove o usuario digitado
+
+                if (txtidproduto.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Campo Id Produto está vazio");
+                } else {
+
+                    int remover = ps.executeUpdate();
+                    if (remover > 0) {
+                        JOptionPane.showMessageDialog(null, "Produto removido com sucesso");
+                        limpar_dados();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Produto não encontrado");
+                    }
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+    }
+
     private void limpar_dados() {
         txtidproduto.setText(null);
-        txtdescricao.setText(null);        
+        txtdescricao.setText(null);
         txtdata_compra.setText(null);
         txtpreco_compra.setText(null);
         txtpreco_venda.setText(null);
+        inicializar_cbt();
+    }
+
+    private void inicializar_cbt() {
+        rbtp.setSelected(true);
+        tamanho = "P";
+        rbts.setSelected(true);
+        status = "sim";
     }
 }
